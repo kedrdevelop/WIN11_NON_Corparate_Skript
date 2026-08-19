@@ -1,220 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<unattend xmlns="urn:schemas-microsoft-com:unattend">
-    <!-- Windows PE Phase: Language, Partitioning, LabConfig Bypasses -->
-    <settings pass="windowsPE">
-        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <SetupUILanguage>
-                <UILanguage>de-DE</UILanguage>
-            </SetupUILanguage>
-            <InputLocale>0407:00000407</InputLocale>
-            <SystemLocale>de-DE</SystemLocale>
-            <UILanguage>de-DE</UILanguage>
-            <UILanguageFallback>de-DE</UILanguageFallback>
-            <UserLocale>de-DE</UserLocale>
-        </component>
-        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <!-- Wipe and Partition Disk 0 (Target Drive) with valid GPT Layout -->
-            <DiskConfiguration>
-                <Disk wcm:action="add">
-                    <DiskID>0</DiskID>
-                    <WillWipeDisk>true</WillWipeDisk>
-                    <CreatePartitions>
-                        <!-- Partition 1: EFI System Partition (300 MB) -->
-                        <CreatePartition wcm:action="add">
-                            <Order>1</Order>
-                            <Size>300</Size>
-                            <Type>EFI</Type>
-                        </CreatePartition>
-                        <!-- Partition 2: Microsoft Reserved Partition (MSR, 16 MB) -->
-                        <CreatePartition wcm:action="add">
-                            <Order>2</Order>
-                            <Size>16</Size>
-                            <Type>MSR</Type>
-                        </CreatePartition>
-                        <!-- Partition 3: Windows OS Primary Partition (Rest of Disk) -->
-                        <CreatePartition wcm:action="add">
-                            <Order>3</Order>
-                            <Extend>true</Extend>
-                            <Type>Primary</Type>
-                        </CreatePartition>
-                    </CreatePartitions>
-                    <ModifyPartitions>
-                        <!-- Modify Partition 1: EFI System Partition formatted as FAT32 -->
-                        <ModifyPartition wcm:action="add">
-                            <Order>1</Order>
-                            <PartitionID>1</PartitionID>
-                            <Format>FAT32</Format>
-                            <Label>System</Label>
-                        </ModifyPartition>
-                        <!-- Modify Partition 3: Primary OS Partition formatted as NTFS -->
-                        <ModifyPartition wcm:action="add">
-                            <Order>2</Order>
-                            <PartitionID>3</PartitionID>
-                            <Format>NTFS</Format>
-                            <Label>Windows</Label>
-                            <Letter>C</Letter>
-                        </ModifyPartition>
-                    </ModifyPartitions>
-                </Disk>
-            </DiskConfiguration>
-            <!-- Install Image to Disk 0 Partition 3 (Windows 11 Pro) -->
-            <ImageInstall>
-                <OSImage>
-                    <InstallFrom>
-                        <MetaData wcm:action="add">
-                            <Key>/IMAGE/NAME</Key>
-                            <Value>Windows 11 Pro</Value>
-                        </MetaData>
-                    </InstallFrom>
-                    <InstallTo>
-                        <DiskID>0</DiskID>
-                        <PartitionID>3</PartitionID>
-                    </InstallTo>
-                    <InstallToAvailablePartition>false</InstallToAvailablePartition>
-                    <WillShowUI>OnError</WillShowUI>
-                </OSImage>
-            </ImageInstall>
-            <!-- Accept EULA and Set Generic Windows 11 Pro Key -->
-            <UserData>
-                <AcceptEula>true</AcceptEula>
-                <ProductKey>
-                    <Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
-                    <WillShowUI>OnError</WillShowUI>
-                </ProductKey>
-            </UserData>
-            <!-- Registry Bypasses for Hardware Requirements and OOBE Network Requirement -->
-            <RunSynchronous>
-                <RunSynchronousCommand wcm:action="add">
-                    <Order>1</Order>
-                    <Path>reg add "HKLM\SYSTEM\Setup\LabConfig" /v BypassTPMCheck /t REG_DWORD /d 1 /f</Path>
-                    <Description>Bypass TPM Check</Description>
-                </RunSynchronousCommand>
-                <RunSynchronousCommand wcm:action="add">
-                    <Order>2</Order>
-                    <Path>reg add "HKLM\SYSTEM\Setup\LabConfig" /v BypassSecureBootCheck /t REG_DWORD /d 1 /f</Path>
-                    <Description>Bypass Secure Boot Check</Description>
-                </RunSynchronousCommand>
-                <RunSynchronousCommand wcm:action="add">
-                    <Order>3</Order>
-                    <Path>reg add "HKLM\SYSTEM\Setup\LabConfig" /v BypassRAMCheck /t REG_DWORD /d 1 /f</Path>
-                    <Description>Bypass RAM Check</Description>
-                </RunSynchronousCommand>
-                <RunSynchronousCommand wcm:action="add">
-                    <Order>4</Order>
-                    <Path>reg add "HKLM\SYSTEM\Setup\LabConfig" /v BypassCPUCheck /t REG_DWORD /d 1 /f</Path>
-                    <Description>Bypass CPU Check</Description>
-                </RunSynchronousCommand>
-                <RunSynchronousCommand wcm:action="add">
-                    <Order>5</Order>
-                    <Path>reg add "HKLM\SYSTEM\Setup\LabConfig" /v BypassStorageCheck /t REG_DWORD /d 1 /f</Path>
-                    <Description>Bypass Storage Check</Description>
-                </RunSynchronousCommand>
-                <RunSynchronousCommand wcm:action="add">
-                    <Order>6</Order>
-                    <Path>reg add "HKLM\SYSTEM\Setup\LabConfig" /v BypassNRO /t REG_DWORD /d 1 /f</Path>
-                    <Description>Bypass Network Requirement</Description>
-                </RunSynchronousCommand>
-            </RunSynchronous>
-        </component>
-    </settings>
-
-    <!-- Generalize Phase -->
-    <settings pass="generalize">
-        <component name="Microsoft-Windows-Security-SPP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <SkipRearm>1</SkipRearm>
-        </component>
-    </settings>
-
-    <!-- Specialize Phase: Language, TimeZone, Pre-Configuration -->
-    <settings pass="specialize">
-        <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <InputLocale>0407:00000407</InputLocale>
-            <SystemLocale>de-DE</SystemLocale>
-            <UILanguage>de-DE</UILanguage>
-            <UILanguageFallback>de-DE</UILanguageFallback>
-            <UserLocale>de-DE</UserLocale>
-        </component>
-        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <ComputerName>*</ComputerName>
-            <TimeZone>W. Europe Standard Time</TimeZone>
-            <RegisteredOwner>User</RegisteredOwner>
-            <RegisteredOrganization>Workstation</RegisteredOrganization>
-        </component>
-        <component name="Microsoft-Windows-Deployment" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <RunSynchronous>
-                <!-- Bypass Network Requirement in Registry -->
-                <RunSynchronousCommand wcm:action="add">
-                    <Order>1</Order>
-                    <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE" /v BypassNRO /t REG_DWORD /d 1 /f</Path>
-                    <Description>Disable Network Requirement in OOBE</Description>
-                </RunSynchronousCommand>
-                <!-- Set AutoLogon in Registry as Backup -->
-                <RunSynchronousCommand wcm:action="add">
-                    <Order>2</Order>
-                    <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v AutoAdminLogon /t REG_SZ /d 1 /f</Path>
-                    <Description>Enable AutoLogon</Description>
-                </RunSynchronousCommand>
-                <RunSynchronousCommand wcm:action="add">
-                    <Order>3</Order>
-                    <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v DefaultUserName /t REG_SZ /d User /f</Path>
-                    <Description>Set DefaultUserName to User</Description>
-                </RunSynchronousCommand>
-                <RunSynchronousCommand wcm:action="add">
-                    <Order>4</Order>
-                    <Path>reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v DefaultPassword /t REG_SZ /d "" /f</Path>
-                    <Description>Set Blank DefaultPassword</Description>
-                </RunSynchronousCommand>
-            </RunSynchronous>
-        </component>
-    </settings>
-
-    <!-- OOBE System Phase: Skip OOBE, Create Local User Without Password, AutoLogon -->
-    <settings pass="oobeSystem">
-        <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <InputLocale>0407:00000407</InputLocale>
-            <SystemLocale>de-DE</SystemLocale>
-            <UILanguage>de-DE</UILanguage>
-            <UILanguageFallback>de-DE</UILanguageFallback>
-            <UserLocale>de-DE</UserLocale>
-        </component>
-        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <!-- Completely Skip OOBE Screens and Prevent Online Account Prompts -->
-            <OOBE>
-                <HideEULAPage>true</HideEULAPage>
-                <HideLocalAccountScreen>true</HideLocalAccountScreen>
-                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
-                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
-                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
-                <NetworkLocation>Work</NetworkLocation>
-                <ProtectYourPC>3</ProtectYourPC>
-                <SkipMachineOOBE>true</SkipMachineOOBE>
-                <SkipUserOOBE>true</SkipUserOOBE>
-            </OOBE>
-            <!-- Create Local Administrator User Named "User" Without Password -->
-            <UserAccounts>
-                <LocalAccounts>
-                    <LocalAccount wcm:action="add">
-                        <Name>User</Name>
-                        <DisplayName>User</DisplayName>
-                        <Group>Administrators</Group>
-                        <Description>Local Administrator Account</Description>
-                        <Password>
-                            <Value></Value>
-                            <PlainText>true</PlainText>
-                        </Password>
-                    </LocalAccount>
-                </LocalAccounts>
-            </UserAccounts>
-            <!-- Automatically Log into Local Account -->
-            <AutoLogon>
-                <Enabled>true</Enabled>
-                <LogonCount>5</LogonCount>
-                <Username>User</Username>
-                <Password>
-                    <Value></Value>
-                    <PlainText>true</PlainText>
-                </Password>
-            </AutoLogon>
-        </component>
-    </settings>
+<unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+	<settings pass="windowsPE">
+		<component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+			<SetupUILanguage>
+				<UILanguage>de-DE</UILanguage>
+			</SetupUILanguage>
+			<InputLocale>0407:00000407</InputLocale>
+			<SystemLocale>de-DE</SystemLocale>
+			<UILanguage>de-DE</UILanguage>
+			<UserLocale>de-DE</UserLocale>
+		</component>
+		<component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+			<ImageInstall>
+				<OSImage>
+					<InstallTo>
+						<DiskID>0</DiskID>
+						<PartitionID>3</PartitionID>
+					</InstallTo>
+				</OSImage>
+			</ImageInstall>
+			<UserData>
+				<ProductKey>
+					<Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
+					<WillShowUI>OnError</WillShowUI>
+				</ProductKey>
+				<AcceptEula>true</AcceptEula>
+			</UserData>
+			<UseConfigurationSet>false</UseConfigurationSet>
+			<RunSynchronous>
+				<RunSynchronousCommand wcm:action="add">
+					<Order>1</Order>
+					<Path>cmd.exe /c "&gt;&gt;"X:\diskpart.txt" (echo SELECT DISK=0&amp;echo CLEAN&amp;echo CONVERT GPT&amp;echo CREATE PARTITION EFI SIZE=300&amp;echo FORMAT QUICK FS=FAT32 LABEL="System"&amp;echo CREATE PARTITION MSR SIZE=16)"</Path>
+				</RunSynchronousCommand>
+				<RunSynchronousCommand wcm:action="add">
+					<Order>2</Order>
+					<Path>cmd.exe /c "&gt;&gt;"X:\diskpart.txt" (echo CREATE PARTITION PRIMARY&amp;echo SHRINK MINIMUM=1000&amp;echo FORMAT QUICK FS=NTFS LABEL="Windows"&amp;echo CREATE PARTITION PRIMARY&amp;echo FORMAT QUICK FS=NTFS LABEL="Recovery")"</Path>
+				</RunSynchronousCommand>
+				<RunSynchronousCommand wcm:action="add">
+					<Order>3</Order>
+					<Path>cmd.exe /c "&gt;&gt;"X:\diskpart.txt" (echo SET ID="de94bba4-06d1-4d40-a16a-bfd50179d6ac"&amp;echo GPT ATTRIBUTES=0x8000000000000001)"</Path>
+				</RunSynchronousCommand>
+				<RunSynchronousCommand wcm:action="add">
+					<Order>4</Order>
+					<Path>cmd.exe /c "diskpart.exe /s "X:\diskpart.txt" &gt;&gt;"X:\diskpart.log" || ( type "X:\diskpart.log" &amp; echo diskpart encountered an error. &amp; pause &amp; exit /b 1 )"</Path>
+				</RunSynchronousCommand>
+			</RunSynchronous>
+		</component>
+	</settings>
+	<settings pass="oobeSystem">
+		<component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+			<InputLocale>0407:00000407</InputLocale>
+			<SystemLocale>de-DE</SystemLocale>
+			<UILanguage>de-DE</UILanguage>
+			<UserLocale>de-DE</UserLocale>
+		</component>
+		<component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+			<OOBE>
+				<ProtectYourPC>3</ProtectYourPC>
+				<HideEULAPage>true</HideEULAPage>
+				<HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+				<HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+				<HideLocalAccountScreen>true</HideLocalAccountScreen>
+				<HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+			</OOBE>
+			<UserAccounts>
+				<LocalAccounts>
+					<LocalAccount wcm:action="add">
+						<Name>User</Name>
+						<Group>Administrators</Group>
+						<Password>
+							<Value></Value>
+							<PlainText>true</PlainText>
+						</Password>
+					</LocalAccount>
+				</LocalAccounts>
+			</UserAccounts>
+			<AutoLogon>
+				<Username>User</Username>
+				<Enabled>true</Enabled>
+				<LogonCount>1</LogonCount>
+				<Password>
+					<Value></Value>
+					<PlainText>true</PlainText>
+				</Password>
+			</AutoLogon>
+		</component>
+	</settings>
 </unattend>

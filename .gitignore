@@ -25,3 +25,5 @@ $RECYCLE.BIN/
 *.ntvs*
 *.njsproj
 *.sln.docstates
+
+/Working_Example/
